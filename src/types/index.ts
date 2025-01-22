@@ -2,7 +2,7 @@ export interface Participant {
   username: string;
   weight: number;
   timestamp: number;
-  source: 'twitch' | 'manual';
+  source: 'kick' | 'manual';
 }
 
 export interface RaffleSettings {
@@ -12,6 +12,9 @@ export interface RaffleSettings {
   soundEnabled: boolean;
   theme: 'dark' | 'light' | 'matrix';
   animationType: 'matrix' | 'particles' | 'glitch';
+  keyword?: string;
+  language?: string;
+  subscriberLuck?: number;
   eligibilityRules: {
     minFollowAge: number;
     minSubMonths: number;

@@ -6,26 +6,34 @@ interface RaffleStore {
   winners: Participant[];
   settings: RaffleSettings;
   isDrawing: boolean;
-  twitchChannel: string;
+  channel: string;
   isConnected: boolean;
+  messages: { username: string; message: string; timestamp: number }[];
+  winnerMessages: { username: string; message: string; timestamp: number }[];
   
   addParticipant: (participant: Participant) => void;
   removeParticipant: (username: string) => void;
   setWinners: (winners: Participant[]) => void;
   updateSettings: (settings: Partial<RaffleSettings>) => void;
   setDrawing: (isDrawing: boolean) => void;
-  setTwitchChannel: (channel: string) => void;
+  setChannel: (channel: string) => void;
   setConnected: (isConnected: boolean) => void;
   clearParticipants: () => void;
   clearWinners: () => void;
+  addMessage: (message: { username: string; message: string; timestamp: number }) => void;
+  addWinnerMessage: (message: { username: string; message: string; timestamp: number }) => void;
+  clearMessages: () => void;
+  clearWinnerMessages: () => void;
 }
 
 export const useRaffleStore = create<RaffleStore>((set) => ({
   participants: [],
   winners: [],
   isDrawing: false,
-  twitchChannel: '',
+  channel: '',
   isConnected: false,
+  messages: [],
+  winnerMessages: [],
   settings: {
     drawingMethod: 'random',
     winnerCount: 1,
@@ -33,10 +41,13 @@ export const useRaffleStore = create<RaffleStore>((set) => ({
     soundEnabled: true,
     theme: 'dark',
     animationType: 'matrix',
+    keyword: '',
+    language: 'en',
+    subscriberLuck: 1,
     eligibilityRules: {
       minFollowAge: 0,
       minSubMonths: 0,
-      roles: [],
+      roles: ['Mod', 'VIP', 'OG', 'Sub', 'Follower'],
     },
   },
 
@@ -59,11 +70,25 @@ export const useRaffleStore = create<RaffleStore>((set) => ({
 
   setDrawing: (isDrawing) => set({ isDrawing }),
   
-  setTwitchChannel: (channel) => set({ twitchChannel: channel }),
+  setChannel: (channel) => set({ channel }),
   
   setConnected: (isConnected) => set({ isConnected }),
   
   clearParticipants: () => set({ participants: [] }),
   
   clearWinners: () => set({ winners: [] }),
+
+  addMessage: (message) =>
+    set((state) => ({
+      messages: [...state.messages, message].slice(-100), // Keep last 100 messages
+    })),
+
+  addWinnerMessage: (message) =>
+    set((state) => ({
+      winnerMessages: [...state.winnerMessages, message].slice(-100),
+    })),
+
+  clearMessages: () => set({ messages: [] }),
+  
+  clearWinnerMessages: () => set({ winnerMessages: [] }),
 }));
